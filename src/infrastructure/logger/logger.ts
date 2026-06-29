@@ -8,9 +8,7 @@ import { env } from '../../config/env';
 export const logger = pino({
   name: env.SERVICE_NAME,
   level: env.LOG_LEVEL,
-
   timestamp: pino.stdTimeFunctions.isoTime,
-
   base: {
     service: env.SERVICE_NAME,
   },
