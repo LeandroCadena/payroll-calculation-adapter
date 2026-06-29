@@ -1,5 +1,6 @@
 export {
   createCalculationRecord,
+  findCalculationByIdempotencyKey,
   findCalculationRecord,
   updateCalculationStatus,
 } from './calculation-status.repository';

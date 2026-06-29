@@ -2,7 +2,10 @@ import { randomUUID } from 'node:crypto';
 
 import { processCalculateAssociate } from '@/application/processors/calculate-associate';
 import { dispatchBackgroundTask } from '@/infrastructure/background';
-import { createCalculationRecord } from '@/repositories/calculations';
+import {
+  createCalculationRecord,
+  findCalculationByIdempotencyKey,
+} from '@/repositories/calculations';
 import { createCalculateAssociateIdempotencyKey } from '@/shared/idempotency';
 
 import type {
@@ -13,13 +16,20 @@ import type {
 export const executeCalculateAssociateUseCase = (
   request: CalculateAssociateRequestDto,
 ): CalculateAssociateAcceptedResponseDto => {
+  const idempotencyKey = createCalculateAssociateIdempotencyKey(request);
+  const existingCalculation = findCalculationByIdempotencyKey(idempotencyKey);
+
+  if (existingCalculation) {
+    return {
+      calculationGroupId: existingCalculation.calculationGroupId,
+      status: 'CALCULATING',
+      message: 'Calculation request already exists and is being processed',
+    };
+  }
+
   const calculationGroupId = randomUUID();
 
-  const idempotencyKey = createCalculateAssociateIdempotencyKey(request);
-
-  createCalculationRecord(calculationGroupId);
-
-  void idempotencyKey;
+  createCalculationRecord(calculationGroupId, idempotencyKey);
 
   dispatchBackgroundTask(async () => {
     await processCalculateAssociate(calculationGroupId, request);
