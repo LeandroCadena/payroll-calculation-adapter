@@ -6,12 +6,14 @@ const calculationsByIdempotencyKey = new Map<string, string>();
 export const createCalculationRecord = (
   calculationGroupId: string,
   idempotencyKey: string,
+  correlationId: string,
 ): CalculationRecord => {
   const now = new Date();
 
   const record: CalculationRecord = {
     calculationGroupId,
     idempotencyKey,
+    correlationId,
     status: 'CALCULATING',
     createdAt: now,
     updatedAt: now,

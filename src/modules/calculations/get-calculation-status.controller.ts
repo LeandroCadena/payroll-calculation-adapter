@@ -22,6 +22,7 @@ export const getCalculationStatus = async (
 
   res.status(200).json({
     calculationGroupId: calculation.calculationGroupId,
+    correlationId: calculation.correlationId,
     status: calculation.status,
     createdAt: calculation.createdAt.toISOString(),
     updatedAt: calculation.updatedAt.toISOString(),

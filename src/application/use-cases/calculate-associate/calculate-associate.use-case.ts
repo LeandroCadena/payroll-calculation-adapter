@@ -31,7 +31,7 @@ export const executeCalculateAssociateUseCase = (
   const calculationGroupId = randomUUID();
   const correlationId = createCorrelationId();
 
-  createCalculationRecord(calculationGroupId, idempotencyKey);
+  createCalculationRecord(calculationGroupId, idempotencyKey, correlationId);
 
   dispatchBackgroundTask(async () => {
     await processCalculateAssociate(calculationGroupId, correlationId, request);
