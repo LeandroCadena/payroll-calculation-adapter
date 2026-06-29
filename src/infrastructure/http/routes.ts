@@ -1,8 +1,8 @@
 import type { Express } from 'express';
-import { healthRoutes } from '@/modules/health';
 
-// Centralizamos el registro de rutas HTTP.
-// Esto mantiene app.ts limpio y permite agregar versiones como /api/v1 sin duplicar configuración.
+import { healthRoutes } from '@/modules/health';
+import { oauthTokenRoutes } from '@/modules/oauth';
+
 export const registerRoutes = (app: Express): void => {
   app.get('/', (_req, res) => {
     res.status(200).json({
@@ -12,4 +12,5 @@ export const registerRoutes = (app: Express): void => {
   });
 
   app.use('/', healthRoutes);
+  app.use('/', oauthTokenRoutes);
 };
