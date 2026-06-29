@@ -1,15 +1,15 @@
 ---
 name: Feature request
 about: Suggest a new feature for Payroll Calculation Adapter
-title: "feat: "
+title: 'feat: '
 labels: enhancement
-assignees: ""
+assignees: ''
 ---
 
 ## Description
 
 ## Acceptance Criteria
 
-- 
+-
 
 ## Technical Notes

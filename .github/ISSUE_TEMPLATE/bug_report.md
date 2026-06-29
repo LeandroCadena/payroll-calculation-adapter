@@ -1,16 +1,16 @@
 ---
 name: Bug report
 about: Report a bug
-title: "fix: "
+title: 'fix: '
 labels: bug
-assignees: ""
+assignees: ''
 ---
 
 ## Description
 
 ## Steps to Reproduce
 
-1. 
+1.
 
 ## Expected Behavior
 
