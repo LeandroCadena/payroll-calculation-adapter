@@ -1,12 +1,14 @@
+import { ExternalServiceError } from '@/shared/errors';
+
 import type { PayrollBuilderRequest, PayrollBuilderResponse } from './payroll-builder.types';
 
-// Este mock simula el payroll-builder real.
-// En producción, este client podría reemplazarse por una llamada HTTP al repo en Go.
 export const fetchPayrollBuilderData = async (
   request: PayrollBuilderRequest,
   accessToken: string,
 ): Promise<PayrollBuilderResponse> => {
-  void accessToken;
+  if (!accessToken) {
+    throw new ExternalServiceError('payroll-builder', 'Missing OAuth access token');
+  }
 
   return {
     associates: request.associateOIDs.map((associateOID) => ({

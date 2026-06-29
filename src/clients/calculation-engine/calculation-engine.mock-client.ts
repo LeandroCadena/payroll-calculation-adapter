@@ -1,15 +1,17 @@
+import { ExternalServiceError } from '@/shared/errors';
+
 import type {
   CalculationEngineRequest,
   CalculationEngineResponse,
 } from './calculation-engine.types';
 
-// Este mock simula el calculation-engine real.
-// Más adelante podrá reemplazarse por un client HTTP o por otro repo independiente.
 export const calculatePayroll = async (
   request: CalculationEngineRequest,
   accessToken: string,
 ): Promise<CalculationEngineResponse> => {
-  void accessToken;
+  if (!accessToken) {
+    throw new ExternalServiceError('calculation-engine', 'Missing OAuth access token');
+  }
 
   return {
     calculationGroupId: request.calculationGroupId,
