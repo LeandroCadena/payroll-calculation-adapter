@@ -14,11 +14,13 @@ import type { CalculateAssociateRequestDto } from '@/modules/calculate-associate
 // el estado del proceso y evitar cálculos "colgados" en CALCULATING.
 export const processCalculateAssociate = async (
   calculationGroupId: string,
+  correlationId: string,
   request: CalculateAssociateRequestDto,
 ): Promise<void> => {
   try {
     logger.info(
       {
+        correlationId,
         calculationGroupId,
         requesterAOID: request.requesterAOID,
         associateCount: request.calculateAssociate.length,
@@ -46,6 +48,7 @@ export const processCalculateAssociate = async (
 
     logger.info(
       {
+        correlationId,
         calculationGroupId,
         associateCount: payrollBuilderResponse.associates.length,
       },
@@ -60,6 +63,7 @@ export const processCalculateAssociate = async (
 
     logger.info(
       {
+        correlationId,
         calculationGroupId,
         associateCount: calculationEngineInput.length,
       },
@@ -87,6 +91,7 @@ export const processCalculateAssociate = async (
 
     logger.info(
       {
+        correlationId,
         calculationGroupId,
         resultCount: calculationEngineResponse.results.length,
       },
@@ -97,6 +102,7 @@ export const processCalculateAssociate = async (
 
     logger.info(
       {
+        correlationId,
         calculationGroupId,
       },
       'Calculation finished successfully',
@@ -108,6 +114,7 @@ export const processCalculateAssociate = async (
 
     logger.error(
       {
+        correlationId,
         calculationGroupId,
         error,
       },
