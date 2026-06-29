@@ -14,16 +14,24 @@ Example:
 import { logger } from '../../../../infrastructure/logger';
 ```
 
-This makes files harder to read and increases the risk of broken imports when files move.
+This reduces readability and makes refactoring harder.
 
 ## Decision
 
-Use TypeScript path aliases with `@/` pointing to the `src/` directory.
+Use TypeScript path aliases with `@/` pointing to `src/`.
 
 Example:
 
 ```ts
 import { logger } from '@/infrastructure/logger';
+```
+
+Because this project uses TypeScript 6, we avoid the deprecated `baseUrl` option and define paths directly:
+
+```json
+"paths": {
+  "@/*": ["./src/*"]
+}
 ```
 
 ## Consequences
@@ -37,18 +45,21 @@ import { logger } from '@/infrastructure/logger';
 
 ### Trade-offs
 
-- Requires TypeScript configuration.
-- Runtime tools must understand the alias.
-- Test tools may also need alias configuration.
+- Runtime tools must support the alias.
+- Test tools may require extra configuration later.
 
 ## Senior Notes
 
-Path aliases do not replace good architecture.
+Path aliases improve developer experience, but they do not replace good architecture.
 
-They improve developer experience, but module boundaries still need to be respected.
+Module boundaries still need to be respected.
 
 ## Interview Notes
 
 ### Why use path aliases?
 
-Path aliases keep imports readable and reduce coupling to folder depth. This is useful in larger projects where files move often and relative imports become difficult to maintain.
+Path aliases keep imports readable and avoid fragile relative paths in large projects.
+
+### Why avoid deprecated baseUrl?
+
+Because using modern TypeScript configuration prevents future migration problems.
