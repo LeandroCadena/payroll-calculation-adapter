@@ -5,6 +5,7 @@ import { dispatchBackgroundTask } from '@/infrastructure/background';
 import { logger } from '@/infrastructure/logger';
 import { getValidOAuthToken } from '@/modules/oauth';
 import { createCalculationRecord, updateCalculationStatus } from '@/repositories/calculations';
+import { validatePayrollBuilderAssociates } from '@/domain/payroll/payroll-business-validation';
 
 import type {
   CalculateAssociateAcceptedResponseDto,
@@ -37,6 +38,8 @@ export const executeCalculateAssociateUseCase = (
       },
       token.accessToken,
     );
+
+    validatePayrollBuilderAssociates(payrollBuilderResponse.associates);
 
     logger.info(
       {
