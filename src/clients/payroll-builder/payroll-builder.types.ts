@@ -1,6 +1,7 @@
 export interface PayrollBuilderRequest {
   requesterAOID: string;
   associateOIDs: string[];
+  correlationId: string;
 }
 
 export interface PayrollBuilderAssociate {

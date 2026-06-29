@@ -2,6 +2,7 @@ import type { CalculationEngineAssociateInput } from '@/application/mappers/calc
 
 export interface CalculationEngineRequest {
   calculationGroupId: string;
+  correlationId: string;
   associates: CalculationEngineAssociateInput[];
 }
 

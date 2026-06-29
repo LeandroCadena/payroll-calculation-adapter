@@ -37,6 +37,7 @@ export const processCalculateAssociate = async (
           {
             requesterAOID: request.requesterAOID,
             associateOIDs: request.calculateAssociate.map((item) => item.associateOID),
+            correlationId,
           },
           payrollBuilderToken.accessToken,
         ),
@@ -80,6 +81,7 @@ export const processCalculateAssociate = async (
           {
             calculationGroupId,
             associates: calculationEngineInput,
+            correlationId,
           },
           calculationEngineToken.accessToken,
         ),
