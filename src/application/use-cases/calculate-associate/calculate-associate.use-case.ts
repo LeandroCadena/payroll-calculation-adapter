@@ -6,6 +6,7 @@ import { logger } from '@/infrastructure/logger';
 import { getValidOAuthToken } from '@/modules/oauth';
 import { createCalculationRecord, updateCalculationStatus } from '@/repositories/calculations';
 import { validatePayrollBuilderAssociates } from '@/domain/payroll/payroll-business-validation';
+import { mapPayrollBuilderAssociatesToCalculationEngineInput } from '@/application/mappers/calculation-engine.mapper';
 
 import type {
   CalculateAssociateAcceptedResponseDto,
@@ -39,14 +40,26 @@ export const executeCalculateAssociateUseCase = (
       token.accessToken,
     );
 
-    validatePayrollBuilderAssociates(payrollBuilderResponse.associates);
-
     logger.info(
       {
         calculationGroupId,
         associateCount: payrollBuilderResponse.associates.length,
       },
       'Payroll builder data received',
+    );
+
+    validatePayrollBuilderAssociates(payrollBuilderResponse.associates);
+
+    const calculationEngineInput = mapPayrollBuilderAssociatesToCalculationEngineInput(
+      payrollBuilderResponse.associates,
+    );
+
+    logger.info(
+      {
+        calculationGroupId,
+        associateCount: calculationEngineInput.length,
+      },
+      'Payroll builder data mapped to calculation engine input',
     );
 
     updateCalculationStatus(calculationGroupId, 'CALCULATED');
