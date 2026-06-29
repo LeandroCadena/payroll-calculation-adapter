@@ -1,0 +1,43 @@
+{
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/src/server.js",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "test": "jest",
+    "test:coverage": "jest --coverage",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,js,json,md}": [
+      "prettier --write",
+      "eslint --fix"
+    ]
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "pino": "^10.3.1",
+    "pino-http": "^11.0.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/express": "^5.0.6",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^26.0.1",
+    "@types/supertest": "^7.2.0",
+    "eslint": "^10.6.0",
+    "eslint-config-prettier": "^10.1.8",
+    "husky": "^9.1.7",
+    "jest": "^30.4.2",
+    "lint-staged": "^17.0.8",
+    "prettier": "^3.9.1",
+    "supertest": "^7.2.2",
+    "ts-jest": "^29.4.11",
+    "tsx": "^4.22.4",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.62.0"
+  }
+}
