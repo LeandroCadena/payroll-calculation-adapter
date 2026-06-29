@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "dev": "tsx watch src/server.ts",
+    "dev": "tsx watch -r tsconfig-paths/register src/server.ts",
     "build": "tsc",
     "start": "node dist/src/server.js",
     "lint": "eslint .",
@@ -36,6 +36,7 @@
     "prettier": "^3.9.1",
     "supertest": "^7.2.2",
     "ts-jest": "^29.4.11",
+    "tsconfig-paths": "^4.2.0",
     "tsx": "^4.22.4",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.62.0"
