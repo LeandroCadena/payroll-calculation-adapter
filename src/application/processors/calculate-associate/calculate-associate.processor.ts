@@ -5,6 +5,7 @@ import { validatePayrollBuilderAssociates } from '@/domain/payroll/payroll-busin
 import { logger } from '@/infrastructure/logger';
 import { getValidOAuthToken } from '@/modules/oauth';
 import { updateCalculationStatus } from '@/repositories/calculations';
+import { executeWithRetry } from '@/shared/retry';
 
 import type { CalculateAssociateRequestDto } from '@/modules/calculate-associate/calculate-associate.dto';
 
@@ -27,12 +28,20 @@ export const processCalculateAssociate = async (
 
     const payrollBuilderToken = await getValidOAuthToken();
 
-    const payrollBuilderResponse = await fetchPayrollBuilderData(
+    const payrollBuilderResponse = await executeWithRetry(
+      'payroll-builder.fetch-data',
+      () =>
+        fetchPayrollBuilderData(
+          {
+            requesterAOID: request.requesterAOID,
+            associateOIDs: request.calculateAssociate.map((item) => item.associateOID),
+          },
+          payrollBuilderToken.accessToken,
+        ),
       {
-        requesterAOID: request.requesterAOID,
-        associateOIDs: request.calculateAssociate.map((item) => item.associateOID),
+        attempts: 3,
+        delayMs: 500,
       },
-      payrollBuilderToken.accessToken,
     );
 
     logger.info(
@@ -60,12 +69,20 @@ export const processCalculateAssociate = async (
     // Revalidamos el token antes de otra integración externa.
     const calculationEngineToken = await getValidOAuthToken();
 
-    const calculationEngineResponse = await calculatePayroll(
+    const calculationEngineResponse = await executeWithRetry(
+      'calculation-engine.calculate-payroll',
+      () =>
+        calculatePayroll(
+          {
+            calculationGroupId,
+            associates: calculationEngineInput,
+          },
+          calculationEngineToken.accessToken,
+        ),
       {
-        calculationGroupId,
-        associates: calculationEngineInput,
+        attempts: 3,
+        delayMs: 500,
       },
-      calculationEngineToken.accessToken,
     );
 
     logger.info(
