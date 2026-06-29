@@ -1,7 +1,7 @@
 import type { RequestHandler } from 'express';
 import type { ZodSchema } from 'zod';
 
-import { ApplicationError } from '@/shared/errors';
+import { ValidationError } from '@/shared/errors';
 
 export const validateRequest =
   (schema: ZodSchema): RequestHandler =>
@@ -13,7 +13,12 @@ export const validateRequest =
     });
 
     if (!result.success) {
-      next(new ApplicationError('Invalid request payload', 400, 'VALIDATION_ERROR'));
+      const issues = result.error.issues.map((issue) => ({
+        path: issue.path.join('.'),
+        message: issue.message,
+      }));
+
+      next(new ValidationError(issues));
 
       return;
     }
