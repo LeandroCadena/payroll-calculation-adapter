@@ -1,4 +1,5 @@
 import { logger } from '@/infrastructure/logger';
+import { ExternalServiceError } from '@/shared/errors';
 
 export interface RetryOptions {
   attempts: number;
@@ -9,8 +10,16 @@ const sleep = (delayMs: number): Promise<void> => {
   return new Promise((resolve) => setTimeout(resolve, delayMs));
 };
 
-// Retry Policy permite reintentar operaciones transitorias.
-// Es común en integraciones externas donde pueden existir timeouts o errores temporales.
+const isRetryableError = (error: unknown): boolean => {
+  if (error instanceof ExternalServiceError) {
+    return error.retryable;
+  }
+
+  return false;
+};
+
+// Retry Policy no debe reintentar cualquier error.
+// Solo reintentamos errores externos marcados como retryable.
 export const executeWithRetry = async <T>(
   operationName: string,
   operation: () => Promise<T>,
@@ -24,6 +33,10 @@ export const executeWithRetry = async <T>(
     } catch (error) {
       lastError = error;
 
+      if (!isRetryableError(error) || attempt === options.attempts) {
+        throw error;
+      }
+
       logger.warn(
         {
           operationName,
@@ -34,9 +47,7 @@ export const executeWithRetry = async <T>(
         'Retryable operation failed',
       );
 
-      if (attempt < options.attempts) {
-        await sleep(options.delayMs * attempt);
-      }
+      await sleep(options.delayMs * attempt);
     }
   }
 
