@@ -22,8 +22,8 @@ export const executeCalculateAssociateUseCase = (
   if (existingCalculation) {
     return {
       calculationGroupId: existingCalculation.calculationGroupId,
-      status: 'CALCULATING',
-      message: 'Calculation request already exists and is being processed',
+      status: existingCalculation.status,
+      message: 'Calculation request already exists',
     };
   }
 

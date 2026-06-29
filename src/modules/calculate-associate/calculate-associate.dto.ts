@@ -19,6 +19,6 @@ export interface CalculateAssociateItemDto {
 
 export interface CalculateAssociateAcceptedResponseDto {
   calculationGroupId: string;
-  status: 'CALCULATING';
+  status: 'CALCULATING' | 'CALCULATED' | 'ERROR';
   message: string;
 }
