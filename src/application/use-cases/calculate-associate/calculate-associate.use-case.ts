@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { processCalculateAssociate } from '@/application/processors/calculate-associate';
 import { dispatchBackgroundTask } from '@/infrastructure/background';
 import { createCalculationRecord } from '@/repositories/calculations';
+import { createCalculateAssociateIdempotencyKey } from '@/shared/idempotency';
 
 import type {
   CalculateAssociateAcceptedResponseDto,
@@ -14,7 +15,11 @@ export const executeCalculateAssociateUseCase = (
 ): CalculateAssociateAcceptedResponseDto => {
   const calculationGroupId = randomUUID();
 
+  const idempotencyKey = createCalculateAssociateIdempotencyKey(request);
+
   createCalculationRecord(calculationGroupId);
+
+  void idempotencyKey;
 
   dispatchBackgroundTask(async () => {
     await processCalculateAssociate(calculationGroupId, request);
