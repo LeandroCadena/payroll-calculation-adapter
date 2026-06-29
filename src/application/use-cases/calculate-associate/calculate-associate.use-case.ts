@@ -1,7 +1,9 @@
 import { randomUUID } from 'node:crypto';
 
+import { fetchPayrollBuilderData } from '@/clients/payroll-builder';
 import { dispatchBackgroundTask } from '@/infrastructure/background';
 import { logger } from '@/infrastructure/logger';
+import { getValidOAuthToken } from '@/modules/oauth';
 import { createCalculationRecord, updateCalculationStatus } from '@/repositories/calculations';
 
 import type {
@@ -24,6 +26,24 @@ export const executeCalculateAssociateUseCase = (
         associateCount: request.calculateAssociate.length,
       },
       'Calculate associate background process started',
+    );
+
+    const token = await getValidOAuthToken();
+
+    const payrollBuilderResponse = await fetchPayrollBuilderData(
+      {
+        requesterAOID: request.requesterAOID,
+        associateOIDs: request.calculateAssociate.map((item) => item.associateOID),
+      },
+      token.accessToken,
+    );
+
+    logger.info(
+      {
+        calculationGroupId,
+        associateCount: payrollBuilderResponse.associates.length,
+      },
+      'Payroll builder data received',
     );
 
     updateCalculationStatus(calculationGroupId, 'CALCULATED');
