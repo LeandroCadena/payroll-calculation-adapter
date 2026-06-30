@@ -10,6 +10,10 @@ import { saveCalculationResults } from '@/repositories/calculation-results';
 import { measurePipelineStep, type PipelineStepMetric } from '@/application/metrics';
 import { createLogContext } from '@/shared/logging';
 import { env } from '@/config/env';
+import {
+  incrementCalculationsCompleted,
+  incrementCalculationsFailed,
+} from '@/infrastructure/metrics';
 
 import type { CalculateAssociateRequestDto } from '@/modules/calculate-associate/calculate-associate.dto';
 
@@ -131,6 +135,8 @@ export const processCalculateAssociate = async (
 
     updateCalculationStatus(calculationGroupId, 'CALCULATED');
 
+    incrementCalculationsCompleted();
+
     logger.info(
       {
         ...logContext,
@@ -149,6 +155,8 @@ export const processCalculateAssociate = async (
     const message = error instanceof Error ? error.message : 'Unknown processing error';
 
     updateCalculationStatus(calculationGroupId, 'ERROR', message);
+
+    incrementCalculationsFailed();
 
     logger.error(
       {

@@ -8,6 +8,7 @@ import {
 } from '@/repositories/calculations';
 import { createCalculateAssociateIdempotencyKey } from '@/shared/idempotency';
 import { createCorrelationId } from '@/shared/correlation';
+import { incrementCalculationsStarted } from '@/infrastructure/metrics';
 
 import type {
   CalculateAssociateAcceptedResponseDto,
@@ -32,6 +33,8 @@ export const executeCalculateAssociateUseCase = (
   const correlationId = createCorrelationId();
 
   createCalculationRecord(calculationGroupId, idempotencyKey, correlationId);
+
+  incrementCalculationsStarted();
 
   dispatchBackgroundTask(async () => {
     await processCalculateAssociate(calculationGroupId, correlationId, request);

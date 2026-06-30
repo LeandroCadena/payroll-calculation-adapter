@@ -1,5 +1,6 @@
 import { logger } from '@/infrastructure/logger';
 import { ExternalServiceError } from '@/shared/errors';
+import { incrementRetries } from '@/infrastructure/metrics';
 
 export interface RetryOptions {
   attempts: number;
@@ -36,6 +37,8 @@ export const executeWithRetry = async <T>(
       if (!isRetryableError(error) || attempt === options.attempts) {
         throw error;
       }
+
+      incrementRetries();
 
       logger.warn(
         {
