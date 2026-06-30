@@ -4,6 +4,7 @@ import { calculateAssociateRoutes } from '@/modules/calculate-associate';
 import { calculationResultsRoutes, calculationStatusRoutes } from '@/modules/calculations';
 import { healthRoutes } from '@/modules/health';
 import { oauthTokenRoutes } from '@/modules/oauth';
+import { metricsRoutes } from '@/modules/metrics';
 
 export const registerRoutes = (app: Express): void => {
   app.get('/', (_req, res) => {
@@ -18,4 +19,5 @@ export const registerRoutes = (app: Express): void => {
   app.use('/', calculateAssociateRoutes);
   app.use('/', calculationStatusRoutes);
   app.use('/', calculationResultsRoutes);
+  app.use('/', metricsRoutes);
 };
