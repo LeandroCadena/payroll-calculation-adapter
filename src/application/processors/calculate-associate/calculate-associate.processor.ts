@@ -6,6 +6,7 @@ import { logger } from '@/infrastructure/logger';
 import { getValidOAuthToken } from '@/modules/oauth';
 import { updateCalculationStatus } from '@/repositories/calculations';
 import { executeWithRetry } from '@/shared/retry';
+import { saveCalculationResults } from '@/repositories/calculation-results';
 
 import type { CalculateAssociateRequestDto } from '@/modules/calculate-associate/calculate-associate.dto';
 
@@ -98,6 +99,18 @@ export const processCalculateAssociate = async (
         resultCount: calculationEngineResponse.results.length,
       },
       'Calculation engine completed',
+    );
+
+    saveCalculationResults(
+      calculationGroupId,
+      calculationEngineResponse.results.map((result) => ({
+        calculationGroupId,
+        associateOID: result.associateOID,
+        grossAmount: result.grossAmount,
+        taxAmount: result.taxAmount,
+        netAmount: result.netAmount,
+        currencyCode: result.currencyCode,
+      })),
     );
 
     updateCalculationStatus(calculationGroupId, 'CALCULATED');
