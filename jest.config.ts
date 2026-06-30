@@ -8,6 +8,9 @@ const config: Config = {
   clearMocks: true,
   collectCoverageFrom: ['src/**/*.ts'],
   coverageDirectory: 'coverage',
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/src/$1',
+  },
 };
 
 export default config;
