@@ -7,6 +7,7 @@ import { getValidOAuthToken } from '@/modules/oauth';
 import { updateCalculationStatus } from '@/repositories/calculations';
 import { executeWithRetry } from '@/shared/retry';
 import { saveCalculationResults } from '@/repositories/calculation-results';
+import { measurePipelineStep, type PipelineStepMetric } from '@/application/metrics';
 
 import type { CalculateAssociateRequestDto } from '@/modules/calculate-associate/calculate-associate.dto';
 
@@ -19,6 +20,8 @@ export const processCalculateAssociate = async (
   request: CalculateAssociateRequestDto,
 ): Promise<void> => {
   try {
+    const metrics: PipelineStepMetric[] = [];
+
     logger.info(
       {
         correlationId,
@@ -31,21 +34,26 @@ export const processCalculateAssociate = async (
 
     const payrollBuilderToken = await getValidOAuthToken();
 
-    const payrollBuilderResponse = await executeWithRetry(
-      'payroll-builder.fetch-data',
+    const payrollBuilderResponse = await measurePipelineStep(
+      'payroll-builder',
       () =>
-        fetchPayrollBuilderData(
+        executeWithRetry(
+          'payroll-builder.fetch-data',
+          () =>
+            fetchPayrollBuilderData(
+              {
+                requesterAOID: request.requesterAOID,
+                associateOIDs: request.calculateAssociate.map((item) => item.associateOID),
+                correlationId,
+              },
+              payrollBuilderToken.accessToken,
+            ),
           {
-            requesterAOID: request.requesterAOID,
-            associateOIDs: request.calculateAssociate.map((item) => item.associateOID),
-            correlationId,
+            attempts: 3,
+            delayMs: 500,
           },
-          payrollBuilderToken.accessToken,
         ),
-      {
-        attempts: 3,
-        delayMs: 500,
-      },
+      metrics,
     );
 
     logger.info(
@@ -75,21 +83,26 @@ export const processCalculateAssociate = async (
     // Revalidamos el token antes de otra integración externa.
     const calculationEngineToken = await getValidOAuthToken();
 
-    const calculationEngineResponse = await executeWithRetry(
-      'calculation-engine.calculate-payroll',
+    const calculationEngineResponse = await measurePipelineStep(
+      'calculation-engine',
       () =>
-        calculatePayroll(
+        executeWithRetry(
+          'calculation-engine.calculate-payroll',
+          () =>
+            calculatePayroll(
+              {
+                calculationGroupId,
+                correlationId,
+                associates: calculationEngineInput,
+              },
+              calculationEngineToken.accessToken,
+            ),
           {
-            calculationGroupId,
-            associates: calculationEngineInput,
-            correlationId,
+            attempts: 3,
+            delayMs: 500,
           },
-          calculationEngineToken.accessToken,
         ),
-      {
-        attempts: 3,
-        delayMs: 500,
-      },
+      metrics,
     );
 
     logger.info(
@@ -114,6 +127,15 @@ export const processCalculateAssociate = async (
     );
 
     updateCalculationStatus(calculationGroupId, 'CALCULATED');
+
+    logger.info(
+      {
+        correlationId,
+        calculationGroupId,
+        metrics,
+      },
+      'Calculate associate pipeline metrics collected',
+    );
 
     logger.info(
       {
