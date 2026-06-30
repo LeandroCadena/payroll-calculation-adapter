@@ -17,6 +17,7 @@ export const logger = pino({
     const context = getRequestContext();
 
     return {
+      requestId: context?.requestId,
       traceId: context?.traceId,
     };
   },
