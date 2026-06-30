@@ -9,6 +9,7 @@ import { executeWithRetry } from '@/shared/retry';
 import { saveCalculationResults } from '@/repositories/calculation-results';
 import { measurePipelineStep, type PipelineStepMetric } from '@/application/metrics';
 import { createLogContext } from '@/shared/logging';
+import { env } from '@/config/env';
 
 import type { CalculateAssociateRequestDto } from '@/modules/calculate-associate/calculate-associate.dto';
 
@@ -54,8 +55,8 @@ export const processCalculateAssociate = async (
               payrollBuilderToken.accessToken,
             ),
           {
-            attempts: 3,
-            delayMs: 500,
+            attempts: env.RETRY_ATTEMPTS,
+            delayMs: env.RETRY_DELAY_MS,
           },
         ),
       metrics,

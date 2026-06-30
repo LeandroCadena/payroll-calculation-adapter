@@ -1,8 +1,9 @@
 import type { OAuthToken, OAuthTokenResponse } from './oauth-token.types';
+import { env } from '@/config/env';
 
 let cachedToken: OAuthToken | null = null;
 
-const TOKEN_REFRESH_THRESHOLD_MS = 30_000;
+const TOKEN_REFRESH_THRESHOLD_MS = env.OAUTH_REFRESH_THRESHOLD_MS;
 
 const requestNewToken = async (): Promise<OAuthTokenResponse> => {
   // Este mock simula un Identity Provider OAuth2.
