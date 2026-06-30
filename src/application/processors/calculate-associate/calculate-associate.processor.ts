@@ -8,6 +8,7 @@ import { updateCalculationStatus } from '@/repositories/calculations';
 import { executeWithRetry } from '@/shared/retry';
 import { saveCalculationResults } from '@/repositories/calculation-results';
 import { measurePipelineStep, type PipelineStepMetric } from '@/application/metrics';
+import { createLogContext } from '@/shared/logging';
 
 import type { CalculateAssociateRequestDto } from '@/modules/calculate-associate/calculate-associate.dto';
 
@@ -22,11 +23,15 @@ export const processCalculateAssociate = async (
   try {
     const metrics: PipelineStepMetric[] = [];
 
+    const logContext = createLogContext({
+      correlationId,
+      calculationGroupId,
+      requesterAOID: request.requesterAOID,
+    });
+
     logger.info(
       {
-        correlationId,
-        calculationGroupId,
-        requesterAOID: request.requesterAOID,
+        ...logContext,
         associateCount: request.calculateAssociate.length,
       },
       'Calculate associate background process started',
@@ -58,8 +63,7 @@ export const processCalculateAssociate = async (
 
     logger.info(
       {
-        correlationId,
-        calculationGroupId,
+        ...logContext,
         associateCount: payrollBuilderResponse.associates.length,
       },
       'Payroll builder data received',
@@ -73,8 +77,7 @@ export const processCalculateAssociate = async (
 
     logger.info(
       {
-        correlationId,
-        calculationGroupId,
+        ...logContext,
         associateCount: calculationEngineInput.length,
       },
       'Payroll builder data mapped',
@@ -107,8 +110,7 @@ export const processCalculateAssociate = async (
 
     logger.info(
       {
-        correlationId,
-        calculationGroupId,
+        ...logContext,
         resultCount: calculationEngineResponse.results.length,
       },
       'Calculation engine completed',
@@ -130,8 +132,7 @@ export const processCalculateAssociate = async (
 
     logger.info(
       {
-        correlationId,
-        calculationGroupId,
+        ...logContext,
         metrics,
       },
       'Calculate associate pipeline metrics collected',
@@ -139,8 +140,7 @@ export const processCalculateAssociate = async (
 
     logger.info(
       {
-        correlationId,
-        calculationGroupId,
+        ...logContext,
       },
       'Calculation finished successfully',
     );
